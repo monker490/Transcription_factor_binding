@@ -6,7 +6,7 @@ import datetime
 import data_helpers
 from model import TextCNN
 from tensorflow.contrib import learn
-from PreProcessing import loadData
+from PreProcessing import loadTrain
 import pandas as pd
 
 # Parameters
@@ -25,8 +25,8 @@ tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (defau
 tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularization lambda (default: 0.0)")
 
 # Training parameters
-tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_integer("num_epochs", 200, "Number of training epochs (default: 200)")
+tf.flags.DEFINE_integer("batch_size", 128, "Batch Size (default: 64)")
+tf.flags.DEFINE_integer("num_epochs", 1000, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 100, "Save model after this many steps (default: 100)")
 tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (default: 5)")
@@ -48,7 +48,7 @@ print("")
 # Load data
 print("Loading data...")
 #x_text, y = data_helpers.load_data_and_labels(FLAGS.positive_data_file, FLAGS.negative_data_file)
-(x , y) = loadData(pd.read_csv('train.csv',header = None, skiprows = 1))
+(x , y) = loadTrain(pd.read_csv('train.csv',header = None, skiprows = 1))
 #print (x_text)
 
 #Build vocabulary
@@ -61,18 +61,18 @@ print("Loading data...")
 # Randomly shuffle data
 np.random.seed(10)
 shuffle_indices = np.random.permutation(np.arange(len(y)))
-x_shuffled = x[shuffle_indices]
-y_shuffled = y[shuffle_indices]
+x_train = x[shuffle_indices]
+y_train = y[shuffle_indices]
 #print (y_shuffled)
 
 # Split train/test set
 # TODO: This is very crude, should use cross-validation
-dev_sample_index = -1 * int(FLAGS.dev_sample_percentage * float(len(y)))
-x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
-y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
+# dev_sample_index = -1 * int(FLAGS.dev_sample_percentage * float(len(y)))
+# x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
+# y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
 
 #print(np.shape(x_train))
-del x, y, x_shuffled, y_shuffled
+# del x, y, x_shuffled, y_shuffled
 
 # print("Vocabulary Size: {:d}".format(len(vocab_processor.vocabulary_)))
 # print("Train/Dev split: {:d}/{:d}".format(len(y_train), len(y_dev)))
@@ -187,10 +187,10 @@ with tf.Graph().as_default():
             #print (np.shape(x_batch))
             train_step(x_batch, y_batch)
             current_step = tf.train.global_step(sess, global_step)
-            if current_step % FLAGS.evaluate_every == 0:
-                print("\nEvaluation:")
-                dev_step(x_dev, y_dev, writer=dev_summary_writer)
-                print("")
+            # if current_step % FLAGS.evaluate_every == 0:
+            #     print("\nEvaluation:")
+            #     dev_step(x_dev, y_dev, writer=dev_summary_writer)
+            #     print("")
             if current_step % FLAGS.checkpoint_every == 0:
                 path = saver.save(sess, checkpoint_prefix, global_step=current_step)
 print("Saved model checkpoint to {}\n".format(path))
