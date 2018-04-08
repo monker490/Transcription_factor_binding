@@ -19,7 +19,7 @@ import pandas as pd
 
 # Eval Parameters
 tf.flags.DEFINE_integer("batch_size", 128, "Batch Size (default: 64)")
-tf.flags.DEFINE_string("checkpoint_dir", "/home/monker490/Work/BigData/Assignment3/runs/1523164821/checkpoints", "Checkpoint directory from training run")
+tf.flags.DEFINE_string("checkpoint_dir", "/home/monker490/Work/BigData/Assignment3/runs/1523176857/checkpoints", "Checkpoint directory from training run")
 tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
 
 # Misc Parameters
